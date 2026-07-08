@@ -1,0 +1,14 @@
+{
+  "config": "baseline",
+  "description": "Dense-only, chunk 800/150, k=4",
+  "questions": 32,
+  "generation_model": "claude-haiku-4-5-20251001",
+  "judge_model": "claude-sonnet-5",
+  "run_at": "2026-07-08T08:14:11+00:00",
+  "metrics": {
+    "faithfulness": 0.6367,
+    "answer_relevancy": 0.5009,
+    "context_precision": 0.3637,
+    "context_recall": 0.4688
+  }
+}

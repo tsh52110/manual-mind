@@ -8,6 +8,13 @@ from __future__ import annotations
 
 import json
 import os
+
+# faiss-cpu and torch each bundle their own OpenMP on macOS; loading the larger
+# index with both runtimes active segfaults (exit 139). Single-threading OpenMP
+# before either library is imported avoids it, at no practical cost here.
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
+
 from functools import lru_cache
 
 from dotenv import load_dotenv
@@ -25,8 +32,9 @@ Rules:
 specs, procedures, torques, capacities, or part numbers.
 - Cite every factual claim inline with the excerpt number(s) in square brackets, \
 e.g. "Tire pressure is 20 psi [1]."
-- If the excerpts do not contain the answer, say so plainly and suggest what to \
-look for in the manuals. Do not guess.
+- If the excerpts do not contain the answer, say so plainly in one short \
+sentence. Do not guess, and do not add advice or information that is not in \
+the excerpts.
 - Safety warnings/cautions present in the excerpts must be repeated.
 - Be concise: short paragraphs or numbered steps."""
 
@@ -134,7 +142,13 @@ def answer(question: str, cfg: RAGConfig | str = "baseline") -> dict:
     resp = _llm().invoke(_messages(question, context))
     return {
         "answer": resp.content,
-        "contexts": [d.page_content for d in docs],
+        # contexts as the generator saw them (source header included) — the
+        # Ragas judge must see the same evidence, or it correctly rejects
+        # claims like "the HMMWV..." that only the header attributes.
+        "contexts": [
+            f"({d.metadata['manual']}, p.{d.metadata['page']}) {d.page_content}"
+            for d in docs
+        ],
         "sources": sources,
     }
 
