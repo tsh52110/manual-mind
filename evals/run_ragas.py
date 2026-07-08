@@ -70,8 +70,11 @@ def score(samples: list[dict]):
 
     from src.config import JUDGE_MODEL
 
-    judge = LangchainLLMWrapper(ChatAnthropic(
-        model=JUDGE_MODEL, temperature=0, max_tokens=4096, max_retries=5))
+    # Claude 5 models reject the deprecated `temperature` param, and ragas
+    # injects one per call unless bypass_temperature is set.
+    judge = LangchainLLMWrapper(
+        ChatAnthropic(model=JUDGE_MODEL, max_tokens=4096, max_retries=5),
+        bypass_temperature=True, bypass_n=True)
     emb = LangchainEmbeddingsWrapper(HuggingFaceEmbeddings(
         model_name="BAAI/bge-small-en-v1.5",
         encode_kwargs={"normalize_embeddings": True}))
@@ -91,6 +94,8 @@ def main() -> None:
     ap.add_argument("--config", choices=list(CONFIGS), required=True)
     ap.add_argument("--subset", type=int, default=None,
                     help="Evaluate only the first N questions (CI gate)")
+    ap.add_argument("--min-faithfulness", type=float, default=None,
+                    help="Exit non-zero if faithfulness falls below this floor")
     args = ap.parse_args()
     cfg = CONFIGS[args.config]
 
@@ -120,6 +125,13 @@ def main() -> None:
         json.dump(summary, f, indent=2)
 
     print(json.dumps(summary["metrics"], indent=2))
+
+    if args.min_faithfulness is not None:
+        got = summary["metrics"]["faithfulness"]
+        if got < args.min_faithfulness:
+            raise SystemExit(
+                f"FAIL: faithfulness {got:.3f} < floor {args.min_faithfulness}")
+        print(f"PASS: faithfulness {got:.3f} >= floor {args.min_faithfulness}")
 
 
 if __name__ == "__main__":
