@@ -52,16 +52,17 @@ code, .mono { font-family: 'JetBrains Mono', monospace; }
   border: 1px solid var(--border);
   background: var(--surface);
 }
-[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]),
-[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+/* the user avatar's data URI is the only one containing the E8EEF5 fill */
+[data-testid="stChatMessage"]:has(img[src*="E8EEF5"]) {
   background: var(--primary);
   border-color: var(--primary);
 }
-[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) p,
-[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) li,
-[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) p,
-[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) li {
+[data-testid="stChatMessage"]:has(img[src*="E8EEF5"]) p,
+[data-testid="stChatMessage"]:has(img[src*="E8EEF5"]) li {
   color: #FFFFFF;
+}
+[data-testid="stChatMessage"] img[src^="data:image/svg"] {
+  width: 32px; height: 32px; border-radius: 50%;
 }
 
 /* source cards */
@@ -140,6 +141,20 @@ st.markdown(CSS, unsafe_allow_html=True)
 ICON_BOOK = """<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1E3A5F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="manual"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>"""
 ICON_WRENCH = """<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1E3A5F" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="ManualMind"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>"""
 ICON_CITE = """<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>"""
+
+AVATAR_USER = (
+    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>"
+    "<rect width='24' height='24' rx='12' fill='%23E8EEF5'/>"
+    "<circle cx='12' cy='9.5' r='3.5' fill='%231E3A5F'/>"
+    "<path d='M5 20c1.5-3.5 4-5 7-5s5.5 1.5 7 5' fill='%231E3A5F'/></svg>"
+)
+AVATAR_BOT = (
+    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>"
+    "<rect width='24' height='24' rx='12' fill='%231E3A5F'/>"
+    "<path d='M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l2.34-2.34a4 4 0 0 1-5.29 5.29"
+    "l-4.58 4.58a1.4 1.4 0 0 1-2-2l4.58-4.58a4 4 0 0 1 5.29-5.29z' "
+    "fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>"
+)
 
 SUGGESTIONS = [
     "How deep can the HMMWV ford water without a fording kit?",
@@ -235,7 +250,7 @@ if not st.session_state.messages:
             st.rerun()
 
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
+    with st.chat_message(msg["role"], avatar=AVATAR_USER if msg["role"] == "user" else AVATAR_BOT):
         st.markdown(msg["content"])
         if msg.get("sources"):
             render_sources(msg["sources"])
@@ -247,10 +262,10 @@ if not prompt and "pending" in st.session_state:
 
 if prompt:
     st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar=AVATAR_USER):
         st.markdown(prompt)
 
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar=AVATAR_BOT):
         try:
             with st.spinner("Searching the manuals…"):
                 warm(config_name)

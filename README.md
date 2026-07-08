@@ -9,7 +9,7 @@ study that changes one variable at a time.
 > Personal learning/portfolio project. All manuals are public-domain works of the
 > U.S. Federal Government (17 U.S.C. § 105) — see [data/SOURCES.md](data/SOURCES.md).
 
-<!-- SCREENSHOT -->
+![ManualMind chat UI: cited answer with source cards](docs/ui-screenshot.png)
 
 ## What it does
 
@@ -32,7 +32,46 @@ study that changes one variable at a time.
 
 ## Results (before/after config study)
 
-<!-- RESULTS -->
+All four configs, one Ragas run each over the same 32 questions (generation:
+claude-haiku-4-5; judge: claude-sonnet-5; deltas vs baseline in parentheses).
+Source of truth: `evals/results/*_summary.json` + `comparison.xlsx`, 2026-07-08.
+
+| Config | faithfulness | answer_relevancy | context_precision | context_recall |
+|---|---|---|---|---|
+| baseline | 0.953 | 0.503 | 0.364 | 0.469 |
+| small-chunks | 0.919 (−0.034) | 0.378 (−0.124) | 0.340 (−0.023) | 0.312 (−0.156) |
+| reranker | 0.961 (+0.008) | 0.676 (+0.174) | 0.572 (+0.208) | 0.656 (+0.187) |
+| hybrid | 0.976 (+0.023) | 0.537 (+0.035) | 0.405 (+0.042) | 0.500 (+0.031) |
+
+**What the numbers say (faithfulness and recall read together):**
+
+- **Baseline is honest but incomplete** — 0.953 faithfulness with only 0.469
+  recall: when retrieval misses, the bot refuses rather than invents, so recall
+  (and relevancy, which punishes refusals) is where the headroom lives.
+- **The reranker is the clear win**: +0.21 context precision and +0.19 recall —
+  fetching 20 candidates and letting a cross-encoder pick 4 fixes most retrieval
+  misses, which cascades into +0.17 answer relevancy (fewer refusals) while
+  keeping faithfulness at 0.961. It's the default config in the app.
+- **The fork's original 300-char chunking measurably hurts**: −0.16 recall vs
+  800-char chunks. Spec tables get shredded below the size of one coherent fact
+  cluster — the eval turned "chunk size matters" from folklore into a number.
+- **Hybrid BM25+dense helps modestly** (+0.03 recall, best-in-study 0.976
+  faithfulness) but doesn't reach the reranker; on this corpus, exact-term
+  matching adds less than candidate re-scoring. (One variable at a time, so
+  reranker+hybrid is untested — the obvious next experiment.)
+
+**Two bugs the eval caught before any number was trusted** (both "before" runs
+are archived in `evals/results/archive-*/` with explanations):
+
+1. **Corpus extraction** — pypdf emitted kerning-broken text ("`15 0
+   horsepower`", "`p s i`") on spec tables. Answers looked right, but the judge
+   correctly scored them unsupported by the corrupted context (baseline
+   faithfulness 0.594). Switching extraction to PyMuPDF fixed the text layer.
+2. **Eval harness** — `retrieved_contexts` initially lacked the `(manual, page)`
+   headers the generator sees, so the judge rejected any claim naming the
+   vehicle ("no mention of HMMWV in the context"): faithfulness 0.0 with recall
+   1.0 on correct answers. Contexts now match what the generator saw
+   (verified on the failing sample: 0.0 → 1.0).
 
 ## Architecture
 
@@ -117,4 +156,9 @@ numbers, page counts, and verification notes: [data/SOURCES.md](data/SOURCES.md)
 
 The app is self-contained (committed indexes + local embeddings): point
 Streamlit Community Cloud or a Hugging Face Space (Streamlit SDK) at this repo,
-set the `ANTHROPIC_API_KEY` secret, done. <!-- LIVE-LINK -->
+set the `ANTHROPIC_API_KEY` secret, done.
+
+- **Streamlit Community Cloud**: share.streamlit.io → New app → this repo,
+  `app.py` → add `ANTHROPIC_API_KEY` under Secrets.
+- **HF Space**: create a Streamlit-SDK Space, push this repo to it, add
+  `ANTHROPIC_API_KEY` as a Space secret.
