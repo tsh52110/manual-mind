@@ -1,119 +1,120 @@
-# RAG-Powered Chatbot & Evaluation
+# ManualMind — RAG over Equipment Service Manuals, Measured with Ragas
 
-## Overview
+A chatbot that answers equipment questions **only** from seven public-domain U.S. Army
+service manuals (HMMWV, 5-ton truck, forklift, generator, air compressor, band saw,
+pneudraulic shop), cites the **manual and page** for every claim, and backs every
+retrieval design choice with **measured Ragas metrics** — including a before/after
+study that changes one variable at a time.
 
-This project aims to create and evaluate a Retrieval-Augmented Generation (RAG) powered chatbot designed to answer questions related to auto insurance policies.
+> Personal learning/portfolio project. All manuals are public-domain works of the
+> U.S. Federal Government (17 U.S.C. § 105) — see [data/SOURCES.md](data/SOURCES.md).
 
-## Demo
-![Alt text for GIF](https://github.com/RitikaVerma7/Chatbot-RAG_with_Evaluation/blob/main/Demo.gif)
+<!-- SCREENSHOT -->
 
+## What it does
 
-## Repository Structure
+- **Grounded chat** — Claude (haiku-4.5) answers strictly from retrieved manual
+  excerpts; each factual claim carries an inline `[n]` citation that maps to a
+  source card (manual title + page). Off-corpus questions get an honest refusal.
+- **Config-driven retrieval** — four single-variable configurations selectable
+  live in the UI sidebar:
 
-The repository is organized into the following folders:
+  | Config | The one change |
+  |---|---|
+  | `baseline` | dense-only, chunk 800/150, k=4 |
+  | `small-chunks` | chunk 300/100 (the forked repo's original setting) |
+  | `reranker` | + cross-encoder rerank of top-20 → k=4 |
+  | `hybrid` | BM25 + dense with reciprocal rank fusion |
 
-- **code**: Contains Jupyter notebooks used for developing and testing the RAG chatbot.
-- **streamlit**: Contains `app.py`, `requirements.txt` and other dependencies to run the chatbot using Streamlit.
-- **Evaluation dataset & result**: Contains CSV files used for evaluation, including `Cleaned_Testcase_Dataset.csv` which is the evaluation dataset.
+- **Measured, not asserted** — a 32-question eval set with ground truths taken
+  from the manuals' own pages, scored with Ragas on faithfulness, answer
+  relevancy, context precision, and context recall.
 
-## RAG System Creation
+## Results (before/after config study)
 
-### Tech Stack
+<!-- RESULTS -->
 
-- OpenAI API
-- FAISS
-- LangChain
-- SentenceTransformers
-- LlamaIndex
-- Ollama, Mistral
-- RAGAs
+## Architecture
 
-### Development Steps
+```
+data/pdfs (7 TMs, 1,939 pages)
+  └─ src/ingest.py    pypdf page-wise extract → per-page chunks (citations never
+                      cross pages) → BAAI/bge-small-en-v1.5 (local) → FAISS
+  └─ src/rag.py       retrieve (dense | +reranker | hybrid RRF) → Claude answers
+                      with forced inline [n] citations
+  └─ evals/           questions.csv (32 q) → run_ragas.py (judge: sonnet-5)
+                      → results/*.json|csv → compare.py → comparison.xlsx/md
+  └─ app.py           Streamlit chat UI (streaming, source cards, config picker)
+```
 
-1. **Chunk Evaluation**: Evaluated different chunk sizes using LlamaIndex. This step was crucial as it directly impacts the efficiency and effectiveness of the RAG system. The evaluation code measures average response time, faithfulness, and relevancy of the responses for various chunk sizes to find the optimal configuration. *Best chunk size: 256*, based on best faithfulness and relevancy.
-2. **Initial Setup**: 
-   - Built a basic local RAG using Chroma DB, Nomic-embed-text embeddings from Ollama, and the Mistral chat model, didn't perform well.
-   - Tried with Pinecone DB as well, but vectorizing with FAISS achieved best results in terms of initial test using chat model.
-3. **First RAG Setup**: 
-   - **PDF Text Extraction**: Extracted text from the policy handbook PDFs using PyPDF2.
-   - **Text Chunking**: Utilized LangChain's RecursiveCharacterTextSplitter to split the extracted text into chunks, optimizing for chunk size and overlap.
-   - **Vector Store Creation**: Generated embeddings using OpenAIEmbeddings and stored them in a FAISS vector database.
-   - **Conversational Chain Setup**: Established a conversational retrieval chain with LangChain, incorporating ChatOpenAI and ConversationBufferMemory to handle user queries and maintain context.
+**Model split:** generation is `claude-haiku-4-5` (fast, cheap), the Ragas judge is
+`claude-sonnet-5` (stronger, and a different model avoids self-preference bias).
+Embeddings are local (no embedding API cost; deployable on a CPU-only Space).
 
-## Initial Evaluation
+## Run it
 
-### Evaluation Dataset Construction
+```bash
+git clone https://github.com/tsh52110/manual-mind && cd manual-mind
+uv venv --python 3.11 .venv && uv pip install -r requirements.txt
+echo "ANTHROPIC_API_KEY=sk-ant-..." > .env
 
-1. **Combination Method**: 
-   - **AI Assistance**: Utilized ChatGPT (Model 4) with specific guidelines to generate 30 entries.
-   - **Manual Search**: Manually searched for top auto insurance questions and found corresponding answers in the policy handbook, 30 entries.
-2. **Diverse Queries**: Ensured that the questions cover different types, document sections, and pages.
-3. **Relevance and Challenge**: Designed questions to reflect real-world scenarios, making them relevant and challenging.
+# indexes are committed; rebuild if you change chunking
+.venv/bin/python -m src.ingest
 
-### Initial Evaluation Methods
+.venv/bin/streamlit run app.py
+```
 
-- **LLM Evaluation**: Developed an evaluation method using the Ollama model to assess the RAG system's performance.
-  - **Accuracy Measurement**: Implemented a process to compare 30 actual responses from the chatbot against expected answers using a structured evaluation prompt.
-  - **Detailed Feedback**: Provided detailed feedback by printing evaluation results, highlighting correct and incorrect responses for further analysis and improvement.
+Evaluate a config and rebuild the comparison table:
 
-- **Embedding-Based Evaluation**: Utilized the SentenceTransformer model to assess the precision, recall, and relevancy of the RAG system's responses.
-  - **Cosine Similarity**: Computed embeddings for expected and actual answers, measuring their similarity to evaluate relevancy.
-  - **Precision and Recall Metrics**: Calculated precision and recall based on token overlap between expected and actual answers.
-  - **Detailed Reporting**: Detailed evaluation results for each test case, including precision, recall, and relevancy scores, along with average metrics for overall performance assessment.
+```bash
+.venv/bin/python -m evals.run_ragas --config reranker
+.venv/bin/python -m evals.compare
+```
 
-## RAG Improvements Measures
+## Eval methodology
 
-1. **Text Cleaning**: Implemented text cleaning to remove newlines and extra spaces, ensuring the text is well-structured and easier to process.
-2. **Metadata Addition**: Added chunk numbers and tried adding page numbers to improve context relevance (in progress).
-3. **MultiQuery Retrieval**: Integrated MultiQueryRetriever to generate multiple variations of user queries (top k as default), enhancing the retrieval process by overcoming limitations of distance-based similarity search.
-4. **Combined Data Sources**: Merged text chunks from the policy document and an additional dataset (10 questions and answers) to replicate few-shot prompting technique.
-5. **Citation Handling**: Added citation information to responses, providing users with the source of the information for better transparency and reliability (page number will be added).
+- 32 questions across all seven manuals (`evals/questions.csv`); each
+  `ground_truth` was written from the manual's own text, page-verified.
+- One Ragas run per config; per-question scores and aggregates are saved in
+  `evals/results/` — every number in the table above comes from a saved run
+  (no hand-entered metrics).
+- **Read faithfulness and context recall together**: faithfulness measures
+  whether the answer sticks to the retrieved excerpts; recall measures whether
+  the right excerpts were retrieved at all. A config can be "honest but
+  incomplete" (high faithfulness, low recall) — which is exactly the trade-off
+  the study surfaces.
+- CI: `.github/workflows/eval-gate.yml` runs a fixed 10-question subset on
+  manual dispatch (and PRs touching `src/`) and fails below a 0.85
+  faithfulness floor. Manual dispatch because judge calls cost real money.
 
-## Final Evaluation
+## Fork provenance & fixes
 
-**Expanded Dataset Evaluation**: Evaluated the RAG system using an updated training set of 50 entries, enhancing the robustness of the evaluation process.
+Forked from [RitikaVerma7/Chatbot-RAG_with_Evaluation](https://github.com/RitikaVerma7/Chatbot-RAG_with_Evaluation)
+(FAISS + LangChain + Ragas + Streamlit over an insurance policy PDF). Kept: the
+overall pipeline shape (PDF → chunk → FAISS → retrieve → answer → Ragas) and its
+chunk 300/100 setting as the `small-chunks` study arm. Fixed/replaced along the way:
 
-### Metrics
+- **Stale pins** (LangChain 0.2.x, Ragas 0.1.9) → current LangChain 1.x / Ragas 0.4.
+- **Ragas legacy import crash** — Ragas ≤0.4.3 imports `ChatVertexAI` from a module
+  removed in langchain-community 1.x; shimmed in `evals/run_ragas.py`.
+- **Claude 5 judge rejects `temperature`** — Ragas injects it per call; fixed with
+  the wrapper's `bypass_temperature`.
+- **Re-embedding the whole corpus on every chat message** (original `app.py`) →
+  indexes built once by `src/ingest.py`, loaded and cached at startup.
+- **String-level citation** ("Source: Policy document") → real per-chunk metadata
+  citations (manual + page), enforced by the prompt and rendered as source cards.
+- OpenAI-only → Anthropic + local embeddings (no OpenAI key required anywhere).
+- The original notebooks and Streamlit app remain in `Code/` and `Streamlit/`,
+  with the upstream README preserved at `docs/UPSTREAM_README.md`.
 
-- **Faithfulness**: Ensures that all claims made in the answer can be inferred from the provided context, reducing hallucinations.
-- **Relevancy**: Higher scores indicate that the chatbot provides more useful and relevant information.
-- **Context Recall**: Measures the extent to which the retrieved context aligns with the annotated answer, ensuring that the necessary information is included in the responses.
-- **Answer Correctness**: Evaluates the accuracy of the generated answer compared to the ground truth. Ensures that the chatbot's answers are correct and reliable.
-- **Context Precision**: Evaluates whether all relevant items in the contexts are ranked higher. Ensures that the most relevant information appears at the top, improving the chatbot’s efficiency in retrieving correct answers.
+## Data sources & licenses
 
-## Evaluation Metrics Scores
+Seven U.S. Army Technical Manuals, all public domain as U.S. Government works
+(17 U.S.C. § 105), downloaded from liberatedmanuals.com. Full table with TM
+numbers, page counts, and verification notes: [data/SOURCES.md](data/SOURCES.md).
 
-The following table summarizes the scores obtained using different evaluation techniques.
+## Deploy
 
-| Technique                   | Faithfulness | Relevancy | Context Recall | Answer Correctness | Context Precision | Accuracy | Precision | Recall |
-|-----------------------------|--------------|-----------|----------------|--------------------|-------------------|----------|-----------|--------|
-| RAGAs Evaluation            | 0.64         | 0.93      | 0.86           | 0.60               | 0.91              | N/A      | N/A       | N/A    |
-| Ollama Model Evaluation     | N/A          | N/A       | N/A            | N/A                | N/A               | 0.96     | N/A       | N/A    |
-| SentenceTransformer Model   | N/A          | 0.82      | N/A            | N/A                | N/A               | N/A      | 0.50      | 0.63   |
-
-- **RAGAs Evaluation**: Aggregated scores for faithfulness, relevancy, context recall, answer correctness, and context precision.
-- **Ollama Model Evaluation**: Focused on accuracy by comparing actual responses with expected answers.
-- **SentenceTransformer Model**: Evaluated average precision, recall, and relevancy by computing embeddings and token overlap.
-
-## Conclusion
-
-This project demonstrates the development and evaluation of a RAG-powered chatbot designed to handle auto insurance queries. Here are the key takeaways from our work:
-
-1. **Dataset Construction**: Combining AI-generated content with manual searches ensured both breadth and depth, covering a wide range of real-world scenarios.
-2. **Technical Stack and Improvements**: Iteratively refined the tech stack, including the use of OpenAI embeddings, FAISS vector database, and LangChain, to optimize the chatbot's performance.
-3. **Evaluation Metrics**: Employed multiple evaluation techniques.
-   - **RAGAs Evaluation** highlighted strong relevancy and context precision but indicated room for improvement in faithfulness and answer correctness.
-   - **Ollama Model Evaluation** achieved high accuracy, demonstrating reliable performance in matching expected answers.
-   - **SentenceTransformer Model** provided insights into precision and recall, suggesting areas for enhancing the overlap between expected and actual answers.
-
-## Steps for Improvement
-
-Based on the evaluation results, future improvements could focus on:
-
-1. **Increasing Faithfulness and Answer Correctness**: Better citation, with page number of the policy document.
-2. **Enhancing Dataset Diversity**: Integrate additional datasets and continue refining the dataset to cover more diverse and challenging scenarios.
-3. **Training on User Feedback**: Taking feedback from streamlit UI, saving it and providing scoring to train LLM
-4. **Expanding Evaluation Metrics**: Implement other evaluation metrics to capture a wider range of performance aspects and further fine-tune the chatbot's capabilities.
-
-
-Thank you for reviewing this project. Contributions and feedback are always welcome.
+The app is self-contained (committed indexes + local embeddings): point
+Streamlit Community Cloud or a Hugging Face Space (Streamlit SDK) at this repo,
+set the `ANTHROPIC_API_KEY` secret, done. <!-- LIVE-LINK -->
