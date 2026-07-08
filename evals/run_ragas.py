@@ -43,7 +43,23 @@ def generate_answers(cfg_name: str, df: pd.DataFrame) -> list[dict]:
     return samples
 
 
+def _shim_legacy_langchain() -> None:
+    """Ragas (<=0.4.3) imports ChatVertexAI from a langchain-community module that
+    was removed in langchain-community 1.x. Ragas only uses it for an isinstance
+    check, so an empty stub keeps the import path alive. Remove once ragas drops
+    the legacy import (noted in README)."""
+    import sys
+    import types
+    try:
+        from langchain_community.chat_models.vertexai import ChatVertexAI  # noqa: F401
+    except ModuleNotFoundError:
+        stub = types.ModuleType("langchain_community.chat_models.vertexai")
+        stub.ChatVertexAI = type("ChatVertexAI", (), {})
+        sys.modules["langchain_community.chat_models.vertexai"] = stub
+
+
 def score(samples: list[dict]):
+    _shim_legacy_langchain()
     from langchain_anthropic import ChatAnthropic
     from langchain_huggingface import HuggingFaceEmbeddings
     from ragas import EvaluationDataset, RunConfig, evaluate
