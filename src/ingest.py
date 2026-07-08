@@ -14,9 +14,11 @@ import argparse
 import json
 import time
 
+import fitz  # PyMuPDF: unlike pypdf, reconstructs kerned text correctly
+               # (pypdf yielded "15 0  horsepower", "p s i" on these TMs, which
+               # tanked Ragas faithfulness — see README "eval-driven fix")
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from pypdf import PdfReader
 
 from src.config import CONFIGS, MANUALS, PDF_DIR, RAGConfig
 
@@ -27,9 +29,9 @@ def load_pages() -> list[Document]:
     low_text_pages = 0
     for stem, title in MANUALS.items():
         path = PDF_DIR / f"{stem}.pdf"
-        reader = PdfReader(path)
-        for i, page in enumerate(reader.pages):
-            text = (page.extract_text() or "").strip()
+        doc = fitz.open(path)
+        for i, page in enumerate(doc):
+            text = page.get_text().strip()
             if len(text) < 50:  # image-only / near-empty page
                 low_text_pages += 1
                 continue
@@ -37,7 +39,8 @@ def load_pages() -> list[Document]:
                 page_content=text,
                 metadata={"manual": title, "tm": stem, "page": i + 1},
             ))
-        print(f"  {stem}: {len(reader.pages)} pages")
+        print(f"  {stem}: {doc.page_count} pages")
+        doc.close()
     total = len(pages) + low_text_pages
     print(f"Loaded {len(pages)}/{total} pages with text "
           f"({low_text_pages} low-text pages skipped)")
