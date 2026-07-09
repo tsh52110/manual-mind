@@ -10,7 +10,7 @@ including a before/after study that changes one variable at a time.
 > Personal learning/portfolio project. Not affiliated with or endorsed by
 > Daimler Truck AG or Daimler Truck North America.
 
-<!-- SCREENSHOT -->
+![ManualMind: cited answer with brand-labeled source cards](docs/ui-screenshot.png)
 
 ## What it does
 
@@ -30,7 +30,33 @@ including a before/after study that changes one variable at a time.
 
 ## Results (before/after config study)
 
-<!-- RESULTS -->
+All four configs, one Ragas run each over the same 28 questions (generation:
+claude-haiku-4-5; judge: claude-sonnet-5; deltas vs baseline in parentheses).
+Source of truth: `evals/results/*_summary.json` + `comparison.xlsx`, 2026-07-08.
+
+| Config | faithfulness | answer_relevancy | context_precision | context_recall |
+|---|---|---|---|---|
+| baseline (dense, 800/150, k=4) | 0.949 | 0.515 | 0.479 | 0.500 |
+| small-chunks (300/100) | 0.973 (+0.024) | 0.532 (+0.017) | 0.494 (+0.015) | 0.524 (+0.024) |
+| **reranker** (top-20 → cross-encoder → 4) | **0.991** (+0.042) | **0.702** (+0.186) | **0.696** (+0.217) | **0.732** (+0.232) |
+| hybrid (BM25+dense RRF) | 0.932 (−0.018) | 0.618 (+0.102) | 0.600 (+0.121) | 0.714 (+0.214) |
+
+**What the numbers say (faithfulness and recall read together):**
+
+- **Baseline is honest but incomplete** — 0.949 faithfulness with 0.500 recall:
+  when retrieval misses, the bot refuses rather than invents.
+- **The reranker is the clear win**: +0.22 context precision and +0.23 recall,
+  cascading into +0.19 answer relevancy (fewer refusals) while *raising*
+  faithfulness to 0.991. It ships as the default ("Best quality") mode.
+- **Hybrid retrieves well but generates slightly worse** (+0.21 recall,
+  −0.02 faithfulness) — keyword matches sometimes surface near-miss passages
+  the generator over-trusts. It ships as "Exact words + meaning" for part-number
+  style queries.
+- **Chunk size is corpus-dependent — measured twice, opposite signs.** On this
+  prose-style corpus, 300-char chunks *help* slightly (+0.02 recall). On the
+  earlier spec-table-heavy Army corpus, the same change *hurt* badly (−0.16
+  recall, see `archive-army-corpus/`). Exactly why you measure instead of
+  cargo-culting a chunk size.
 
 ## Corpus & licensing
 

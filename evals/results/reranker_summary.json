@@ -1,0 +1,14 @@
+{
+  "config": "reranker",
+  "description": "Baseline + cross-encoder rerank of top-20 candidates down to k=4",
+  "questions": 28,
+  "generation_model": "claude-haiku-4-5-20251001",
+  "judge_model": "claude-sonnet-5",
+  "run_at": "2026-07-09T05:44:48+00:00",
+  "metrics": {
+    "faithfulness": 0.9911,
+    "answer_relevancy": 0.702,
+    "context_precision": 0.6964,
+    "context_recall": 0.7321
+  }
+}

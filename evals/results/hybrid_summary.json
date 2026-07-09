@@ -1,0 +1,14 @@
+{
+  "config": "hybrid",
+  "description": "Baseline but hybrid BM25+dense (equal weights) instead of dense-only",
+  "questions": 28,
+  "generation_model": "claude-haiku-4-5-20251001",
+  "judge_model": "claude-sonnet-5",
+  "run_at": "2026-07-09T05:48:23+00:00",
+  "metrics": {
+    "faithfulness": 0.9317,
+    "answer_relevancy": 0.618,
+    "context_precision": 0.6002,
+    "context_recall": 0.7143
+  }
+}
