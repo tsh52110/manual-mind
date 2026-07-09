@@ -1,6 +1,15 @@
 # PRD — ManualMind: RAG Chatbot over Public Equipment Service Manuals
 
-**Author:** Taha Hussain · **Date:** 2026-07-08 · **Status:** v1 (portfolio/learning project)
+**Author:** Taha Hussain · **Date:** 2026-07-08 · **Status:** v2 (portfolio/learning project)
+
+> **v2 addendum (same day):** corpus pivoted from public-domain US Army TMs to
+> official Daimler Truck brand manuals (Freightliner / Western Star / FUSO /
+> Mercedes-Benz Trucks) to target the DTNA demo audience; added an in-UI
+> "Add a manual" ingestion path and plain-language search settings. Because the
+> Daimler manuals are copyrighted (publicly distributed, not public domain),
+> PDFs/indexes are no longer committed — `scripts/fetch_manuals.py` pulls them
+> from official sources. Success metrics and methodology unchanged; the Army
+> corpus study is archived in `evals/results/archive-army-corpus/`.
 
 ## Problem
 
