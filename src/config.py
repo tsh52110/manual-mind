@@ -7,24 +7,31 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-PDF_DIR = REPO_ROOT / "data" / "pdfs"
+PDF_DIR = REPO_ROOT / "data" / "daimler"
 INDEX_DIR = REPO_ROOT / "indexes"
+MANIFEST = REPO_ROOT / "data" / "manuals.json"
 
 EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 RERANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 GENERATION_MODEL = "claude-haiku-4-5-20251001"
 JUDGE_MODEL = "claude-sonnet-5"
 
-# Friendly names for citations and the UI sidebar.
-MANUALS = {
-    "TM-9-2320-280-10": "HMMWV M998 Utility Truck — Operator's Manual",
-    "TM-9-2320-272-10": "M939 5-Ton 6x6 Truck — Operator's Manual",
-    "TM-10-3930-660-10": "6,000 lb Rough-Terrain Forklift — Operator's Manual",
-    "TM-9-6115-641-10": "MEP-802A 5 kW Tactical Quiet Generator — Operator's Manual",
-    "TM-5-4310-387-14": "KA7-DA Diesel Air Compressor — Maintenance Manual",
-    "TM-9-3419-227-10": "16-Inch Metal-Cutting Band Saw — Operator's Manual",
-    "TM-1-4920-433-13-and-P": "Pneudraulic Shop Set — Maintenance Manual & RPSTL",
-}
+BRANDS = ["Freightliner", "Western Star", "FUSO", "Mercedes-Benz Trucks",
+          "Mercedes-Benz Buses", "Other Daimler"]
+
+
+def load_manifest() -> list[dict]:
+    """Corpus manifest: one entry per manual (brand, title, file, source, license).
+
+    Uploads via the app append here, so read fresh rather than caching at import.
+    """
+    import json
+    with open(MANIFEST) as f:
+        return json.load(f)["manuals"]
+
+
+def manuals_by_id() -> dict[str, dict]:
+    return {m["id"]: m for m in load_manifest()}
 
 
 @dataclass(frozen=True)

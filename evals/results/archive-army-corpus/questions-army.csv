@@ -1,0 +1,33 @@
+question,ground_truth,manual
+How deep can the HMMWV ford water without a deep water fording kit?,"The HMMWV can ford hard-bottom water crossings up to 30 inches (76 centimeters) deep without a deep water fording kit, and up to 60 inches (152 centimeters) with the kit installed.",TM-9-2320-280-10
+What is the fuel tank capacity of the HMMWV?,The HMMWV fuel tank holds 25 gallons (94.6 liters).,TM-9-2320-280-10
+What is the cooling system capacity of the HMMWV?,The HMMWV cooling system capacity is 26 quarts (24.6 liters).,TM-9-2320-280-10
+How much oil does the HMMWV engine take when the filter is also replaced?,"The engine takes 8 quarts (7.6 liters) for the crankcase with a new filter; the crankcase alone takes 7 quarts (6.6 liters).",TM-9-2320-280-10
+What horsepower does the HMMWV 6.2 liter diesel engine produce?,The 6.2 liter diesel engine produces 150 brake horsepower at 3600 rpm.,TM-9-2320-280-10
+What payload can the M998 cargo/troop carrier transport?,"The M998 cargo carrier can transport a payload, including crew, of 2,500 pounds (1,134 kilograms).",TM-9-2320-280-10
+What is the steepest road grade a fully loaded M998 HMMWV can climb?,"A fully loaded M998 can climb road grades as steep as 60% (31 degrees) and traverse a side slope of up to 40% (22 degrees).",TM-9-2320-280-10
+What type of brake fluid does the HMMWV brake system use?,The HMMWV brake system uses Brake Fluid Silicone (BFS) in all expected temperature ranges.,TM-9-2320-280-10
+What is the idle speed of the HMMWV 6.2 liter engine?,The 6.2 liter engine idle speed is 650 plus or minus 25 rpm.,TM-9-2320-280-10
+What engine powers the M939 and M939A1 series 5-ton trucks and what is its horsepower?,"The M939 and M939A1 series use the Cummins NHC 250, a naturally-aspirated liquid-cooled 6-cylinder in-line diesel producing 250 horsepower at 2100 rpm.",TM-9-2320-272-10
+What is the approximate fuel consumption of the M939A2 series truck?,The M939A2 series has an approximate fuel consumption of 5.5 to 6.0 miles per gallon (2.3 to 2.6 km per liter).,TM-9-2320-272-10
+What are the four preset tire pressure modes of the CTIS on M939A2 series vehicles?,"The CTIS selector panel has four preset tire pressure modes: highway (HWY), cross-country (X-C), sand, and emergency (EMER), plus a run-flat selector.",TM-9-2320-272-10
+Which CTIS tire pressure mode is automatically set when the M939A2 engine is started?,The highway (HWY) mode is automatically set each time the engine is started.,TM-9-2320-272-10
+What does the run flat selector do on the M939A2 CTIS?,The RUN FLAT selector causes the CTIS to check tire pressures every fifteen seconds.,TM-9-2320-272-10
+What is the transmission oil capacity of the M939 series truck for a drain and refill?,The transmission oil capacity for drain and refill is 4.25 gallons (16.1 liters) with or without PTO.,TM-9-2320-272-10
+At what temperatures does the thermostat of the NHC 250 engine start to open and fully open?,The NHC 250 engine thermostat starts to open at 175 degrees F (79 C) and is fully open at 185 degrees F (85 C).,TM-9-2320-272-10
+What is the fuel tank capacity of the MEP-802A generator set?,The MEP-802A fuel tank capacity is 5 gallons (18.9 liters).,TM-9-6115-641-10
+How much fuel does the MEP-802A generator consume per hour at 60 Hz?,"At 60 Hz the fuel consumption rate is approximately 0.55 gallons (2.1 liters) per hour; at 400 Hz it is 0.61 gallons (2.3 liters) per hour.",TM-9-6115-641-10
+What engine is used in the MEP-802A generator set?,"The MEP-802A uses an Onan model DN2M-1 engine: a two-cylinder, four-cycle, naturally-aspirated diesel with 57 cubic inches (0.9 liters) displacement.",TM-9-6115-641-10
+What is the lubricating system capacity of the MEP-802A generator set?,The lubricating system capacity is 3.2 quarts (3.0 liters).,TM-9-6115-641-10
+When should the cold weather starting aid be used on the MEP-802A generator?,The cold weather starting aid system should be used when the temperature is +40 degrees F (4 degrees C) or below.,TM-9-6115-641-10
+What batteries are used to start the MEP-802A generator set?,The starting system uses two 12-volt batteries connected in series (24 VDC).,TM-9-6115-641-10
+What fuels can the MEP-802A generator set use?,"The MEP-802A can use DF-1, DF-2, DF-A, JP4, JP5, and JP8 fuels.",TM-9-6115-641-10
+What is the normal operating oil pressure of the MEP-802A generator engine?,The normal operating pressure of the lubricating system is 25 to 60 psi (172 to 414 kPa).,TM-9-6115-641-10
+When driving the 6K rough terrain forklift on a slope which way should the forks point?,"A loaded forklift should travel with the forks (and load) pointing uphill; an empty forklift should travel with the forks pointing downhill.",TM-10-3930-660-10
+Why must the counterweight be in place on the 6K forklift?,"The counterweight must be in place because an unbalanced forklift could tip over, which could cause severe personal injury.",TM-10-3930-660-10
+What is the rated capacity of the rough terrain forklift covered by TM 10-3930-660-10?,"It is a 6,000 lb variable reach, rough terrain forklift truck.",TM-10-3930-660-10
+To approximately what pressure does the KA7-DA air compressor compress air?,The compressor compresses atmospheric air to a pressure of about 3200 psig.,TM-5-4310-387-14
+What is the delivery rate of the KA7-DA air compressor?,The delivery rate is 5 SCFM minimum at 3200 PSIG (220 BAR).,TM-5-4310-387-14
+What is the fuel tank capacity of the KA7-DA compressor's engine?,The engine fuel tank has a capacity of approximately 4 quarts (3.7 liters).,TM-5-4310-387-14
+What is the maximum brake horsepower of the KA7-DA compressor's diesel engine?,The maximum brake horsepower of the engine is 6.2 BHP at 3600 RPM.,TM-5-4310-387-14
+What is the purpose of the pneudraulic shop set?,The pneudraulic shop set provides pneumatic and hydraulic repair and fabrication support for divisional and higher-level maintenance units.,TM-1-4920-433-13-and-P

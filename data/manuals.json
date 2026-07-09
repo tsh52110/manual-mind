@@ -1,0 +1,60 @@
+{
+  "manuals": [
+    {
+      "id": "freightliner-cascadia-drivers-manual",
+      "brand": "Freightliner",
+      "title": "Cascadia — Driver's Manual",
+      "file": "freightliner-cascadia-drivers-manual.pdf",
+      "source_url": "https://dtnacontent-dtna.prd.freightliner.com/content/dam/public/dtna-servicelit/dtna/pdfs/en_us/freightliner/drivers-manuals/Cascadia%20Driver's%20Manual_.pdf",
+      "license": "© Daimler Truck North America LLC. Publicly distributed by DTNA; not redistributed in this repo."
+    },
+    {
+      "id": "freightliner-cascadia-maintenance-manual",
+      "brand": "Freightliner",
+      "title": "Cascadia — Maintenance Manual",
+      "file": "freightliner-cascadia-maintenance-manual.pdf",
+      "source_url": "https://dtnacontent-dtna.prd.freightliner.com/content/dam/public/dtna-servicelit/dtna/pdfs/en_us/freightliner/drivers-manuals/Cascadia%20Maintenance%20Manual_.pdf",
+      "license": "© Daimler Truck North America LLC. Publicly distributed by DTNA; not redistributed in this repo."
+    },
+    {
+      "id": "freightliner-ecascadia-maintenance-manual",
+      "brand": "Freightliner",
+      "title": "eCascadia (electric) — Maintenance Manual",
+      "file": "freightliner-ecascadia-maintenance-manual.pdf",
+      "source_url": "https://dtnacontent-dtna.prd.freightliner.com/content/dam/public/dtna-servicelit/dtna/pdfs/en_us/freightliner/drivers-manuals/eCascadia%20Maintenance%20Manual.pdf",
+      "license": "© Daimler Truck North America LLC. Publicly distributed by DTNA; not redistributed in this repo."
+    },
+    {
+      "id": "westernstar-47x-49x-drivers-manual",
+      "brand": "Western Star",
+      "title": "47X / 49X — Driver's Manual",
+      "file": "westernstar-47x-49x-drivers-manual.pdf",
+      "source_url": "https://dtnacontent-dtna.prd.freightliner.com/content/dam/public/dtna-servicelit/dtna/pdfs/en_us/western-star/drivers-manuals/47X%2C%2049X%20Drivers%20Manual.pdf",
+      "license": "© Daimler Truck North America LLC. Publicly distributed by DTNA; not redistributed in this repo."
+    },
+    {
+      "id": "westernstar-47x-49x-maintenance-manual",
+      "brand": "Western Star",
+      "title": "47X / 49X — Maintenance Manual",
+      "file": "westernstar-47x-49x-maintenance-manual.pdf",
+      "source_url": "https://dtnacontent-dtna.prd.freightliner.com/content/dam/public/dtna-servicelit/dtna/pdfs/en_us/western-star/maintenance-manuals/47X%2C%2049X%20Maintenance%20Manual.pdf",
+      "license": "© Daimler Truck North America LLC. Publicly distributed by DTNA; not redistributed in this repo."
+    },
+    {
+      "id": "fuso-fe-fg-owners-manual",
+      "brand": "FUSO",
+      "title": "FE / FG Series — Owner's Manual",
+      "file": "fuso-fe-fg-owners-manual.pdf",
+      "source_url": "https://www.mitfuso.com/files/Owners-Manual-FUSO-2015-FEFG.pdf",
+      "license": "© Mitsubishi Fuso Truck of America (Daimler Truck). Publicly distributed on mitfuso.com; not redistributed in this repo."
+    },
+    {
+      "id": "mercedes-actros-arocs-operators-manual",
+      "brand": "Mercedes-Benz Trucks",
+      "title": "Actros / Arocs — Operator's Manual",
+      "file": "mercedes-actros-arocs-operators-manual.pdf",
+      "source_url": "https://fcc.report/FCC-ID/2AMIOCTP4465960/4542965.pdf",
+      "license": "© Mercedes-Benz Trucks (Daimler Truck AG). Public FCC-filing copy; not redistributed in this repo."
+    }
+  ]
+}

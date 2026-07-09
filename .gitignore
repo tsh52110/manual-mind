@@ -3,6 +3,9 @@ __pycache__/
 *.pyc
 .env
 .DS_Store
-
-
 .streamlit/secrets.toml
+# Daimler-brand manuals are publicly downloadable but (c) Daimler Truck —
+# fetched by scripts/fetch_manuals.py, never committed. Index chunk text is
+# derived from them, so indexes stay local too.
+data/daimler/
+indexes/

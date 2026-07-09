@@ -108,13 +108,20 @@ def retrieve(question: str, cfg: RAGConfig) -> list[Document]:
     return docs[: cfg.top_k]
 
 
+def _source_header(m: dict) -> str:
+    brand = m.get("brand", "")
+    label = f"{brand} {m['manual']}" if brand else m["manual"]
+    return f"({label}, p.{m['page']})"
+
+
 def _format_context(docs: list[Document]) -> tuple[str, list[dict]]:
     blocks, sources = [], []
     for i, d in enumerate(docs, 1):
         m = d.metadata
-        blocks.append(f"[{i}] ({m['manual']}, p.{m['page']})\n{d.page_content}")
+        blocks.append(f"[{i}] {_source_header(m)}\n{d.page_content}")
         sources.append({
-            "n": i, "manual": m["manual"], "tm": m["tm"], "page": m["page"],
+            "n": i, "manual": m["manual"], "tm": m["tm"],
+            "brand": m.get("brand", ""), "page": m["page"],
             "snippet": d.page_content[:200],
         })
     return "\n\n".join(blocks), sources
@@ -144,10 +151,9 @@ def answer(question: str, cfg: RAGConfig | str = "baseline") -> dict:
         "answer": resp.content,
         # contexts as the generator saw them (source header included) — the
         # Ragas judge must see the same evidence, or it correctly rejects
-        # claims like "the HMMWV..." that only the header attributes.
+        # claims like "the Cascadia..." that only the header attributes.
         "contexts": [
-            f"({d.metadata['manual']}, p.{d.metadata['page']}) {d.page_content}"
-            for d in docs
+            f"{_source_header(d.metadata)} {d.page_content}" for d in docs
         ],
         "sources": sources,
     }
