@@ -34,6 +34,14 @@ jobs:
           path: ~/.cache/huggingface
           key: hf-bge-small-en-v1.5
 
+      # The Daimler manuals are (c) Daimler Truck (publicly distributed, not
+      # public domain) so neither PDFs nor indexes live in the repo — fetch
+      # from the official URLs and build the baseline index here.
+      - name: Fetch corpus and build baseline index
+        run: |
+          python -m scripts.fetch_manuals
+          python -m src.ingest --config baseline
+
       - name: Run Ragas gate (10-question subset, faithfulness >= 0.85)
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
